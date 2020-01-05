@@ -10,6 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
+    location    "0";
     object      p_rgh;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -20,22 +21,18 @@ internalField   uniform 0;
 
 boundaryField
 {
-    leftWall
+    //- Set patchGroups for constraint patches
+    #includeEtc "caseDicts/setConstraintTypes"
+
+    inlet
     {
         type            fixedFluxPressure;
-        value           uniform 0;
+        value           $internalField;
     }
 
-    rightWall
+    outlet
     {
-        type            fixedFluxPressure;
-        value           uniform 0;
-    }
-
-    lowerWall
-    {
-        type            fixedFluxPressure;
-        value           uniform 0;
+        type            zeroGradient;
     }
 
     atmosphere
@@ -44,9 +41,10 @@ boundaryField
         p0              uniform 0;
     }
 
-    defaultFaces
+    hull
     {
-        type            empty;
+        type            fixedFluxPressure;
+        value           $internalField;
     }
 }
 

@@ -1,0 +1,48 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+Build  : 6
+Exec   : setFields
+Date   : May 22 2019
+Time   : 17:17:49
+Host   : "giulio-pc"
+PID    : 7603
+I/O    : uncollated
+Case   : /home/gortali/ITHACA-FV/tutorials/13InterFoam
+nProcs : 1
+sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create mesh for time = 5
+
+Reading setFieldsDict
+
+Setting field default values
+    Setting internal values of volScalarField alpha.water
+
+Setting field region values
+    Adding cells with center within boxes 1((-999 -999 -999) (999 999 0))
+    Setting internal values of volScalarField alpha.water
+    Adding faces with centre within boxes 1((-999 -999 -999) (999 999 0))
+    Setting patchField values of volScalarField alpha.water
+--> FOAM Warning : 
+    From function bool setFaceFieldType(const Foam::word&, const Foam::fvMesh&, const labelList&, Foam::Istream&) [with Type = double; Foam::labelList = Foam::List<int>]
+    in file setFields.C at line 263
+    Ignoring internal face 0. Suppressing further warnings.
+    On patch outlet set 700 values
+    On patch inlet set 700 values
+    On patch side set 2100 values
+    On patch bottom set 1875 values
+    On patch midplane set 3190 values
+    On patch hull set 2102 values
+
+End
+

@@ -5,23 +5,30 @@
     \\  /    A nd           | Version:  6
      \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
+
 FoamFile
 {
-    version     2.0;
-    format      ascii;
-    class       dictionary;
-    location    "system";
-    object      decomposeParDict;
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          decomposeParDict;
 }
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 numberOfSubdomains 4;
 
-method          simple;
+method          scotch;
 
 simpleCoeffs
 {
-    n               (2 2 1);
+    n               (2 1 1);
     delta           0.001;
 }
 
@@ -32,6 +39,10 @@ hierarchicalCoeffs
     order           xyz;
 }
 
+metisCoeffs
+{
+}
+
 manualCoeffs
 {
     dataFile        "";
@@ -39,7 +50,9 @@ manualCoeffs
 
 distributed     no;
 
-roots           ( );
+roots
+(
+);
 
 
 // ************************************************************************* //

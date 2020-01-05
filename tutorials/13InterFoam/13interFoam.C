@@ -41,21 +41,78 @@ class tutorial13 : public unsteadyNSmulti
         /// Constructor
         explicit tutorial13(int argc, char* argv[])
             :
-            unsteadyNSmulti(argc, argv)
+            unsteadyNSmulti(argc, argv),
+            U(_U()),
+            p(_p())
         {}
+
+        // Fields To Perform
+        volVectorField& U;
+        volScalarField& p;
+
+        void offlineSolve()
+        {
+            Vector<double> inl(0, 0, 0);
+            List<scalar> mu_now(1);
+            if (offline)
+            {
+                ITHACAstream::read_fields(Ufield, U, "./ITHACAoutput/Offline/");
+                ITHACAstream::read_fields(Pfield, p, "./ITHACAoutput/Offline/");
+                mu_samples =
+                    ITHACAstream::readMatrix("./ITHACAoutput/Offline/mu_samples_mat.txt");
+            }
+            else
+            {
+                for (label i = 0; i < mu.cols(); i++)
+                {
+                    //inl[0] = mu(0, i);
+                    mu_now[0] = mu(0, i);
+                    //assignBC(U, BCind, inl);
+                    assignIF(U, inl);
+                    change_viscosity( mu(0, i));
+                    truthSolve(mu_now);
+                }
+            }
+        }
 
 };
 
 int main(int argc, char* argv[])
 {
     // Construct the tutorial object
-    List<scalar> ciao;
     tutorial13 example(argc, argv);
-    example.startTime = 0;
-    example.finalTime = 20;
-    example.timeStep = 0.01;
-    example.writeEvery = 1.0;
+    // Read parameters from ITHACAdict file
+    ITHACAparameters para;
+    int NmodesUout = para.ITHACAdict->lookupOrDefault<int>("NmodesUout", 15);
+    int NmodesPout = para.ITHACAdict->lookupOrDefault<int>("NmodesPout", 15);
+    int NmodesSUPout = para.ITHACAdict->lookupOrDefault<int>("NmodesSUPout", 15);
+    int NmodesUproj = para.ITHACAdict->lookupOrDefault<int>("NmodesUproj", 10);
+    int NmodesPproj = para.ITHACAdict->lookupOrDefault<int>("NmodesPproj", 10);
+    int NmodesSUPproj = para.ITHACAdict->lookupOrDefault<int>("NmodesSUPproj", 10);
+    /// Set the number of parameters
+    example.Pnumber = 1;
+    /// Set samples
+    example.Tnumber = 10;
+    /// Set the parameters infos
+    example.setParameters();
+    // Set the parameter ranges
+    example.mu_range(0, 0) = 0.01;		//NB for now we change viscosity, we will change velocity
+    example.mu_range(0, 1) = 1;
+    // Generate equispaced samples inside the parameter range
+    example.genEquiPar();
+    // Set the inlet boundaries where we have non homogeneous boundary conditions
+    example.inletIndex.resize(1, 2); //not used?
+    example.inletIndex(0, 0) = 0;
+    example.inletIndex(0, 1) = 0;
+    // Time parameters
+    example.startTime = 20;	//times for writing of snapshots?
+    example.finalTime = 25;
+    example.timeStep = 0.5;
+    example.writeEvery = 0.5;	//overwritten by adaptative timestep?
+    // Perform The Offline Solve;
 
-    example.truthSolve(ciao);
-    
+    cout << "vojeoubveqbveqouveqouboubveq" << endl;
+
+    example.offlineSolve();
+    exit(0);
 }

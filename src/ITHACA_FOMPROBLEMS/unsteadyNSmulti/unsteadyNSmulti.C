@@ -51,8 +51,12 @@ unsteadyNSmulti::unsteadyNSmulti(int argc, char* argv[])
  }
 
  argList& args = _args();
+
+// include postProcess.H?
+// include setRootCaseLists.H?
  #include "createTime.H"
- #include "createMesh.H"
+ #include "createMesh.H" //not r present in interFoam? or substituted by createDynamicFvMesh.H?
+ 
  _pimple = autoPtr<pimpleControl>
  (
    new pimpleControl
@@ -60,15 +64,19 @@ unsteadyNSmulti::unsteadyNSmulti(int argc, char* argv[])
      mesh
      )
    );
+ 
  pimpleControl& pimple = _pimple();
  #include "createTimeControls.H"               
+ 
  correctPhi = pimple.dict().lookupOrDefault("correctPhi", mesh.dynamic());
  checkMeshCourantNo = pimple.dict().lookupOrDefault("checkMeshCourantNo", false);
  moveMeshOuterCorrectors  = pimple.dict().lookupOrDefault("moveMeshOuterCorrectors", false);
+
  #include "createFields.H"
  #include "createAlphaFluxes.H"
  #include "createFvOptions.H"
- #include "initCorrectPhi.H"
+ //#include "initCorrectPhi.H" only for moving mesh
+ // "createUfIfPresent.H" missing, only for moving mesh
  para = new ITHACAparameters;
  offline = ITHACAutilities::check_off();
  podex = ITHACAutilities::check_pod();
@@ -79,7 +87,7 @@ unsteadyNSmulti::unsteadyNSmulti(int argc, char* argv[])
 
 void unsteadyNSmulti::truthSolve(List<scalar> mu_now)
 {
-#include "initContinuityErrs.H"
+#include "initContinuityErrs.H" //why here and not at construction?
     Time& runTime = _runTime();
     surfaceScalarField& phi = _phi();
     fvMesh& mesh = _mesh();
@@ -112,10 +120,11 @@ void unsteadyNSmulti::truthSolve(List<scalar> mu_now)
     // Initialize Nsnapshots
     int nsnapshots = 0;
 
+    turbulence->validate();
     
         while (runTime.run())
     {
-        #include "readDyMControls.H"
+        //#include "readDyMControls.H"
         #include "CourantNo.H"
         #include "alphaCourantNo.H"
         #include "setDeltaT.H"
@@ -146,96 +155,3 @@ void unsteadyNSmulti::truthSolve(List<scalar> mu_now)
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
     }
-
-//     Time& runTime = _runTime();
-//     surfaceScalarField& phi = _phi();
-//     fvMesh& mesh = _mesh();
-//     fv::options& fvOptions = _fvOptions();
-//     pimpleControl& pimple = _pimple();
-//     volScalarField p = _p();
-//     volVectorField U = _U();
-//     IOMRFZoneList& MRF = _MRF();
-//     singlePhaseTransportModel& laminarTransport = _laminarTransport();
-//     instantList Times = runTime.times();
-//     runTime.setEndTime(finalTime);
-//     // Perform a TruthSolve
-//     runTime.setTime(Times[1], 1);
-//     runTime.setDeltaT(timeStep);
-//     nextWrite = startTime;
-//     // Initialize Nsnapshots
-//     int nsnapshots = 0;
-
-//     // Start the time loop
-//     while (runTime.run())
-//     {
-// #include "readTimeControls.H"
-// #include "CourantNo.H"
-// #include "setDeltaT.H"
-//         runTime.setEndTime(finalTime + timeStep);
-//         Info << "Time = " << runTime.timeName() << nl << endl;
-
-//         // --- Pressure-velocity PIMPLE corrector loop
-//         while (pimple.loop())
-//         {
-
-// #include "alphaControls.H"
-// #include "alphaEqnSubCycle.H"
-
-// mixture.correct();
-
-// #include "UEqn.H"
-
-//             // --- Pressure corrector loop
-//             while (pimple.correct())
-//             {
-// #include "pEqn.H"
-//             }
-
-//             if (pimple.turbCorr())
-//             {
-//                 //laminarTransport.correct(); //not present in interFoam (?)
-//                 turbulence->correct();
-//             }
-//         }
-
-//         Info << "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-//              << "  ClockTime = " << runTime.elapsedClockTime() << " s"
-//              << nl << endl;
-
-//         if (checkWrite(runTime))
-//         {
-//             nsnapshots += 1;
-//             ITHACAstream::exportSolution(U, name(counter), "./ITHACAoutput/Offline/");
-//             ITHACAstream::exportSolution(p, name(counter), "./ITHACAoutput/Offline/");
-//             std::ofstream of("./ITHACAoutput/Offline/" + name(counter) + "/" +
-//                              runTime.timeName());
-//             Ufield.append(U);
-//             Pfield.append(p);
-//             counter++;
-//             nextWrite += writeEvery;
-//             writeMu(mu_now);
-//             // --- Fill in the mu_samples with parameters (time, mu) to be used for the PODI sample points
-//             mu_samples.conservativeResize(mu_samples.rows() + 1, mu_now.size() + 1);
-//             mu_samples(mu_samples.rows() - 1, 0) = atof(runTime.timeName().c_str());
-
-//             for (int i = 0; i < mu_now.size(); i++)
-//             {
-//                 mu_samples(mu_samples.rows() - 1, i + 1) = mu_now[i];
-//             }
-//         }
-
-//         runTime++;
-//     }
-
-//     // Resize to Unitary if not initialized by user (i.e. non-parametric problem)
-//     if (mu.cols() == 0)
-//     {
-//         mu.resize(1, 1);
-//     }
-
-//     if (mu_samples.rows() == nsnapshots * mu.cols())
-//     {
-//         ITHACAstream::exportMatrix(mu_samples, "mu_samples", "eigen",
-//                                    "./ITHACAoutput/Offline");
-//     }
-}

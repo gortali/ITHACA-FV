@@ -23,13 +23,16 @@ ddtSchemes
 gradSchemes
 {
     default         Gauss linear;
+    limitedGrad     cellLimited Gauss linear 1;
 }
 
 divSchemes
 {
-    div(rhoPhi,U)  Gauss linearUpwind grad(U);
+    div(rhoPhi,U)   Gauss upwind grad(U);
     div(phi,alpha)  Gauss vanLeer;
     div(phirb,alpha) Gauss linear;
+    div(phi,k)      Gauss upwind limitedGrad;
+    div(phi,omega)  Gauss upwind limitedGrad;
     div(((rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
 }
 
@@ -46,6 +49,11 @@ interpolationSchemes
 snGradSchemes
 {
     default         corrected;
+}
+
+wallDist
+{
+    method meshWave;
 }
 
 

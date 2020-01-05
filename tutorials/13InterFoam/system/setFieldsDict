@@ -22,15 +22,28 @@ defaultFieldValues
 
 regions
 (
+    // Set cell values
+    // (does zerogradient on boundaries)
     boxToCell
     {
-        box (0 0 -1) (0.1461 0.292 1);
+        box (-999 -999 -999) (999 999 0.);
+
+        fieldValues
+        (
+            volScalarFieldValue alpha.water 1
+        );
+    }
+
+    // Set patch values (using ==)
+    boxToFace
+    {
+        box (-999 -999 -999) (999 999 0.);
+
         fieldValues
         (
             volScalarFieldValue alpha.water 1
         );
     }
 );
-
 
 // ************************************************************************* //

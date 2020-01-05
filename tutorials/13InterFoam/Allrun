@@ -1,0 +1,42 @@
+#!/bin/bash
+cd ${0%/*} || exit 1    # Run from this directory
+
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+rm -fr log*
+: "
+runApplication blockMesh
+
+runApplication -s 1 snappyHexMesh -dict system/snappyHexMeshDict.1 -overwrite
+
+for i in 1 2
+do
+	runApplication -s $i topoSet #-dict system/topoSetDict.$i
+	runApplication -s $i refineMesh -overwrite #-dict system/refineMeshDict.$i
+done
+
+rm -fr constant/polyMesh/*Level*
+rm -fr constant/polyMesh/*level*
+
+runApplication -s 2 snappyHexMesh -dict system/snappyHexMeshDict.2 -overwrite
+"
+
+runApplication setFields
+
+#runApplication decomposePar
+
+#runParallel renumberMesh -overwrite
+
+#runParallel $(getApplication)
+#runApplication $(getApplication)
+
+13interFoam #> log.13interFoam
+
+#runApplication reconstructPar
+
+mkdir log
+mv log.* log
+rm -fr processor*
+
+#------------------------------------------------------------------------------

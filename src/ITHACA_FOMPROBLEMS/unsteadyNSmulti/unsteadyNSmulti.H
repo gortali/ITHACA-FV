@@ -37,19 +37,20 @@ SourceFiles
 #ifndef unsteadyNSmulti_H
 #define unsteadyNSmulti_H
 #include "fvCFD.H"
-#include "dynamicFvMesh.H"
+//#include "dynamicFvMesh.H"
 #include "CMULES.H"
 #include "EulerDdtScheme.H"
 #include "localEulerDdtScheme.H"
 #include "CrankNicolsonDdtScheme.H"
-#include "subCycle.H"
+#include "subCycle.H"   //not included in folder. found in src/OpenFOAM/algorithms/subCycle. need?
 #include "immiscibleIncompressibleTwoPhaseMixture.H"
 #include "turbulentTransportModel.H"
 #include "pimpleControl.H"
 #include "fvOptions.H"
 #include "CorrectPhi.H"
 #include "fvcSmooth.H"
-#include "unsteadyNS.H"
+
+#include "unsteadyNS.H" //è servito includere cose che erano qua dentro?
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -104,7 +105,7 @@ class unsteadyNSmulti: public unsteadyNS
 
         bool alphaRestart;
 
-        bool LTS;
+        bool LTS; //local time stepping, not included
 
 
         // Functions
